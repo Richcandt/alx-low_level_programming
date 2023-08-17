@@ -1,3 +1,5 @@
+#ifndef STRUCT_H
+#define STRUCT_H
 #include <stdarg.h>
 /**
  * struct Ftype - Struct op

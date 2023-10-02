@@ -1,41 +1,47 @@
 #include "main.h"
-#include <stdio.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <fcntl.h>
+#include <unistd.h>
 #include <stdlib.h>
 
 /**
- * read_textfile - that reads a text file and prints
- * @filename: variable pointer
- * @letters: size letters
- * Description: Write a function that reads a text file and prints it
- * to the POSIX standard output.
- * Return: the actual number of letters it could read and print, 0
+ * append_text_to_file - function that appends text at the end of a file
+ *
+ * @filename: name of the file
+ * @text_content: NULL terminated string to append to end of file
+ *
+ * Return: Returns: 1 on success, -1 on failure
+ * Do not create the file if it does not exit
+ *
+ * if filename is NULL return -1
+ * If text_content is NULL, do not add anything to the file.
+ * Return 1 if the file exists and -1 if the file does not exist or if you
+ * do not have the required permissions to write the file
  */
-
-ssize_t read_textfile(const char *filename, size_t letters)
+int append_text_to_file(const char *filename, char *text_content)
 {
-	ssize_t file, let, g;
-	char *text;
+	int fd, checkw, l = 0;
 
-	text = malloc(letters);
-	if (text == NULL)
-		return (0);
+	if (filename == 0)
+		return (-1);
 
-	if (filename == NULL)
-		return (0);
+	fd = open(filename, O_WRONLY | O_APPEND);
 
-	file = open(filename, O_RDONLY);
+	if (fd == -1)
+		return (-1);
 
-	if (file == -1)
+	if (text_content)
 	{
-		free(text);
-		return (0);
+		while (text_content[l] != 0)
+			l++;
+
+		checkw = write(fd, text_content, l);
+
+		if (checkw == -1)
+			return (-1);
 	}
 
-	let = read(file, text, letters);
-
-	g = write(STDOUT_FILENO, text, let);
-
-	close(file);
-
-	return (g);
+	close(fd);
+	return (1);
 }
